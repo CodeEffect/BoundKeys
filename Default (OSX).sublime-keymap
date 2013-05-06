@@ -1,0 +1,4 @@
+[
+
+    { "keys": ["shift+f10"], "command": "bound_keys" }
+]
