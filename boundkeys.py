@@ -109,7 +109,6 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
         view = self.view
         pluginFiles = []
         errorLoading = []
-        keyFiles = {}
         pluginKeyFiles = {}
         text = ""
         bindings = collections.defaultdict(list)
@@ -126,6 +125,7 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
         # Store the default and user keymap file paths
         defaultKeyBindings = "%s%s%s%sDefault (%s).sublime-keymap" % (sublime.packages_path(), os.sep, "Default", os.sep, platform)
         userKeyBindings = "%s%s%s%sDefault (%s).sublime-keymap" % (sublime.packages_path(), os.sep, "User", os.sep, platform)
+        keyFiles = {"User": userKeyBindings, "Default": defaultKeyBindings}
 
         # Load the ignored packages list
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -147,8 +147,12 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
                         pluginFiles.append(pluginName + os.sep + filename)
 
         # Load all files and parse the JSON contents
-        keyFiles["Default"] = self.loadAndJsonify(defaultKeyBindings)
-        keyFiles["User"] = self.loadAndJsonify(userKeyBindings)
+        for keyFile in keyFiles:
+            fileResult = self.loadAndJsonify(keyFiles[keyFile])
+            if not fileResult:
+                return sublime.error_message("Error loading %s file. This may be due to the file being inaccessible or because the JSON is invalid." % keyFile)
+            else:
+                keyFiles[keyFile] = fileResult
         for pluginFile in pluginFiles:
             fileResult = self.loadAndJsonify(sublime.packages_path() + os.sep + pluginFile)
             if not fileResult:
