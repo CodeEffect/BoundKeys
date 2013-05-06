@@ -25,26 +25,36 @@ class BoundKeysCommand(sublime_plugin.TextCommand):
 
     def separator(self):
         """Return a string of _'s to use when outputting the results"""
-        return " " + u"_" * 128 + "\n"
+        return " %s\n" % (u"_" * 128)
 
     def padTo(self, string, padTo):
         """Pad a string to X chars with spaces"""
         if len(string) > padTo:
             return string[0:padTo - 1] + u"…"
-        return string + " " * (padTo - len(string))
+        return "%s%s" % (string, " " * (padTo - len(string)))
+
+    def orderKeyCombo(self, keyCombo):
+        """Take a key combination and order it alphabetically"""
+        if type(keyCombo) is list:
+            ret = []
+            for keyCom in keyCombo:
+                ret.append("+".join(sorted(keyCom.split("+"))))
+        else:
+            ret = "+".join(sorted(keyCombo.split("+")))
+        return ret
 
     def getOutput(self, name, keyFile, bindings, last=False):
         """Convert JSON dict representing one file into a results table"""
-        text = ""
+        text = []
         # First we add the file name
-        text += u"|   " + name + " key bindings" + " " * (112 - len(name)) + u"|\n"
-        text += self.separator()
+        text.append(u"|    %s key bindings%s|\n" % (name, " " * (111 - len(name))))
+        text.append(self.separator())
         # Loop the key bindings 1 at a time
         for binding in keyFile:
             # Firstly the key sequence
-            text += u"|" + self.padTo(", ".join(binding["keys"]), 25)
+            text.append(u"|%s" % self.padTo(", ".join(binding["keys"]), 25))
             # Next the command that gets called
-            text += u"|" + self.padTo(binding["command"].lower(), 25)
+            text.append(u"|%s" % self.padTo(binding["command"].lower(), 25))
             # Then any arguments passed to the command
             args = []
             if "args" in binding:
@@ -54,13 +64,13 @@ class BoundKeysCommand(sublime_plugin.TextCommand):
                     else:
                         argVal = str(binding["args"][arg])
                     argVal = argVal.replace("\n", "").replace("\t", "TAB")
-                    args.append(arg.lower() + ": " + argVal)
-            text += u"|" + self.padTo(", ".join(args), 25)
+                    args.append("%s: %s" % (arg.lower(), argVal))
+            text.append(u"|%s" % self.padTo(", ".join(args), 25))
             # Now add the list of clashes indicating with *'s if the file overrides
             # our current one
-            if len(bindings[binding["keys"][0].lower()]) > 1:
+            if len(bindings[self.orderKeyCombo(binding["keys"][0].lower())]) > 1:
                 dupedIn = []
-                for dupe in bindings["__".join(binding["keys"]).lower()]:
+                for dupe in bindings["__".join(self.orderKeyCombo(binding["keys"])).lower()]:
                     if dupe != name:
                         if name == "User" or dupe == "Default":
                             dupedIn.append(dupe)
@@ -69,13 +79,13 @@ class BoundKeysCommand(sublime_plugin.TextCommand):
                         else:
                             dupedIn.append(dupe)
                 dupedIn = self.listUnique(dupedIn)
-                text += u"|" + self.padTo(", ".join(dupedIn), 50)
+                text.append(u"|%s" % self.padTo(", ".join(dupedIn), 50))
             else:
-                text += u"|" + self.padTo("", 50)
-            text += u"|" + "\n"
+                text.append(u"|%s" % self.padTo("", 50))
+            text.append(u"|\n")
         if not last:
-            text += "\n" + self.separator()
-        return text
+            text.append("\n%s" % self.separator())
+        return "".join(text)
 
     def listUnique(self, seq):
         """De-dupe the passed list"""
@@ -114,8 +124,8 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
             platform = "Linux"
 
         # Store the default and user keymap file paths
-        defaultKeyBindings = sublime.packages_path() + os.sep + "Default" + os.sep + "Default (" + platform + ").sublime-keymap"
-        userKeyBindings = sublime.packages_path() + os.sep + "User" + os.sep + "Default (" + platform + ").sublime-keymap"
+        defaultKeyBindings = "%s%s%s%sDefault (%s).sublime-keymap" % (sublime.packages_path(), os.sep, "Default", os.sep, platform)
+        userKeyBindings = "%s%s%s%sDefault (%s).sublime-keymap" % (sublime.packages_path(), os.sep, "User", os.sep, platform)
 
         # Load the ignored packages list
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -124,9 +134,9 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
         # Recursively walk the package directory and pull out the file path of
         # any used plugin keymap files
         for root, dirnames, filenames in os.walk(sublime.packages_path()):
-            for filename in fnmatch.filter(filenames, '*.sublime-keymap'):
+            for filename in fnmatch.filter(filenames, "*.sublime-keymap"):
                 # We only need default and default (PLATFORM) files
-                if "Default.sublime-keymap" in filename or "(" + platform + ")" in filename:
+                if "Default.sublime-keymap" in filename or "(%s)" % platform in filename:
                     filepath = os.path.join(root, filename)
                     # Work out the plugin name for checking against the ignored packages list
                     end = filepath.rfind(os.sep)
@@ -150,15 +160,15 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
         # is present in keyed on the actual key combination
         for keyFile in keyFiles:
             for binding in keyFiles[keyFile]:
-                bindings["__".join(binding["keys"])].append(keyFile)
+                bindings["__".join(self.orderKeyCombo(binding["keys"]))].append(keyFile)
         for keyFile in pluginKeyFiles:
             for binding in pluginKeyFiles[keyFile]:
                 shortName = keyFile[0:keyFile.find(os.sep)]
-                bindings["__".join(binding["keys"])].append(shortName)
+                bindings["__".join(self.orderKeyCombo(binding["keys"]))].append(shortName)
 
         # Build our output. User first, then plugins, finally default
         if errorLoading:
-            text += "Error loading the following files: " + ", ".join(errorLoading) + "\n\n"
+            text += "Error loading the following files: %s\n\n" % ", ".join(errorLoading)
         text += self.separator()
         text += self.getOutput("User", keyFiles["User"], bindings)
         for name in sorted(pluginKeyFiles):
