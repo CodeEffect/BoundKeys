@@ -160,8 +160,8 @@ Search through all installed .sublime-keymap files and indicate any clashes and 
             for binding in keyFiles[keyFile]:
                 bindings["__".join(self.orderKeyCombo(binding["keys"]))].append(keyFile)
         for keyFile in pluginKeyFiles:
+            shortName = keyFile[0:keyFile.find(os.sep)]
             for binding in pluginKeyFiles[keyFile]:
-                shortName = keyFile[0:keyFile.find(os.sep)]
                 bindings["__".join(self.orderKeyCombo(binding["keys"]))].append(shortName)
 
         # Build our output. User first, then plugins, finally default
