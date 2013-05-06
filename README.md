@@ -1,15 +1,28 @@
 # Bound Keys #
 
-A plugin to list the contents of keymap files and indicate any clashes / overrides. 
-Sublime Text 2 (http://www.sublimetext.com/2).
+A plugin for Sublime Text 2 to list the contents of keymap files and indicate any clashes / overrides.
 
-The plugin lists the contents of all installed sublime-keymap files from active 
+## Details ##
+
+The plugin lists the contents of all installed .sublime-keymap files from active 
 plugins along with the user and default files. The last column of the table 
-lists clashes of key combinations whilst he prescence of *asterisks* indicate 
+lists clashes of key combinations whilst he presence of *asterisks* indicate 
 that the combination is overridden by the other file.
 
 The presented columns of data are: Key combination, command called, arguments to 
 command and clashes.
+
+## Manual installation ##
+
+At present the plugin is not in package control so you will need to install manually.
+Go to the "Packages" directory (`Preferences` / `Browse Packages…`). Then clone this
+repository:
+
+    git clone git://github.com/CodeEffect/BoundKeys
+
+## Default key bindings ##
+
+`shift+f10 - bound_keys - Open a new tab and list details of all bound keys indicating where clashes occur`
 
 ## License ##
 
