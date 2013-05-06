@@ -52,37 +52,31 @@ class BoundKeysCommand(sublime_plugin.TextCommand):
         # Loop the key bindings 1 at a time
         for binding in keyFile:
             # Firstly the key sequence
-            text.append(u"|%s" % self.padTo(", ".join(binding["keys"]), 25))
+            keys = self.padTo(", ".join(binding["keys"]), 25)
             # Next the command that gets called
-            text.append(u"|%s" % self.padTo(binding["command"].lower(), 25))
+            command = self.padTo(binding["command"].lower(), 25)
             # Then any arguments passed to the command
-            args = []
+            argsList = []
             if "args" in binding:
                 for arg in binding["args"]:
-                    if type(binding["args"][arg]) is str:
-                        argVal = binding["args"][arg]
-                    else:
-                        argVal = str(binding["args"][arg])
-                    argVal = argVal.replace("\n", "").replace("\t", "TAB")
-                    args.append("%s: %s" % (arg.lower(), argVal))
-            text.append(u"|%s" % self.padTo(", ".join(args), 25))
+                    argVal = str(binding["args"][arg]).replace("\n", "").replace("\t", "TAB")
+                    argsList.append("%s: %s" % (arg.lower(), argVal))
+            args = self.padTo(", ".join(argsList), 25)
             # Now add the list of clashes indicating with *'s if the file overrides
             # our current one
             if len(bindings[self.orderKeyCombo(binding["keys"][0].lower())]) > 1:
                 dupedIn = []
                 for dupe in bindings["__".join(self.orderKeyCombo(binding["keys"])).lower()]:
                     if dupe != name:
-                        if name == "User" or dupe == "Default":
-                            dupedIn.append(dupe)
-                        elif name == "Default" or dupe == "User" or name < dupe:
+                        if name == "Default" or dupe == "User" or (name < dupe and dupe != "Default"):
                             dupedIn.append("*" + dupe + "*")
                         else:
                             dupedIn.append(dupe)
-                dupedIn = self.listUnique(dupedIn)
-                text.append(u"|%s" % self.padTo(", ".join(dupedIn), 50))
+                clashes = self.padTo(", ".join(self.listUnique(dupedIn)), 50)
             else:
-                text.append(u"|%s" % self.padTo("", 50))
-            text.append(u"|\n")
+                clashes = self.padTo("", 50)
+            # Now piece them all together
+            text.append(u"|%s|%s|%s|%s|\n" % (keys, command, args, clashes))
         if not last:
             text.append("\n%s" % self.separator())
         return "".join(text)
