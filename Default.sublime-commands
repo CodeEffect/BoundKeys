@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "List bound keys",
+        "command": "bound_keys"
+    }
+]
