@@ -102,7 +102,7 @@ class BoundKeysCommand(sublime_plugin.TextCommand):
             args = self.padTo(", ".join(argsList), 25)
             # Now add the list of clashes indicating with *'s if the file
             # overrides our current one
-            if len(self.bindings[self.prepKey(binding["keys"][0])]) > 1:
+            if len(self.bindings[self.prepKey(binding["keys"])]) > 1:
                 dupedIn = []
                 for dupe in self.bindings[self.prepKey(binding["keys"])]:
                     if dupe != name:
@@ -299,14 +299,13 @@ and overrides.
                                 jsonObj = self.jsonify(
                                     str(zip.open(zipName, "r").read(), "utf-8")
                                 )
-                                fileZipPath = None
-                                zip.close()
                                 userKeys[lastPath] = {}
                                 userKeys[lastPath]["name"] = name
                                 userKeys[lastPath]["loc_key"] = pathName
                                 userKeys[lastPath]["object"] = jsonObj
                                 userKeys[lastPath]["path"] = fullPath
                                 userKeys[lastPath]["zipName"] = zipName
+                            zip.close()
                         except IOError:
                             print("File not found: %s" % fullPath)
                         except zipfile.BadZipfile:
@@ -314,7 +313,6 @@ and overrides.
                 else:
                     # Handle the loose packages folder on ST3 or ST2's only
                     # packages location
-                    fileZipPath = None
                     for filename in fnmatch.filter(files, "*.sublime-keymap"):
                         # We only need default and default (platform) files
                         if filename not in validNames:
@@ -347,14 +345,14 @@ and overrides.
         # combination is present in keyed on the actual key combination
         for lastPath in subKeys:
             for binding in subKeys[lastPath]["object"]:
-                self.bindings["__".join(
+                self.bindings[
                     self.prepKey(binding["keys"])
-                )].append(subKeys[lastPath]["name"])
+                ].append(subKeys[lastPath]["name"])
         for lastPath in userKeys:
             for binding in userKeys[lastPath]["object"]:
-                self.bindings["__".join(
+                self.bindings[
                     self.prepKey(binding["keys"])
-                )].append(userKeys[lastPath]["name"])
+                ].append(userKeys[lastPath]["name"])
 
         # Build our output. User first, then plugins, finally default
         if errorLoading:
