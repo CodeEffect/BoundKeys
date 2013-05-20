@@ -18,7 +18,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/Bound Keys/Default (Windows).sublime-keymap",
+                                    "file": "${packages}/BoundKeys/Default (Windows).sublime-keymap",
                                     "platform": "Windows"
                                 },
                                 "caption": "Key Bindings – Default"
@@ -26,7 +26,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/Bound Keys/Default (OSX).sublime-keymap",
+                                    "file": "${packages}/BoundKeys/Default (OSX).sublime-keymap",
                                     "platform": "OSX"
                                 },
                                 "caption": "Key Bindings – Default"
@@ -34,7 +34,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/Bound Keys/Default (Linux).sublime-keymap",
+                                    "file": "${packages}/BoundKeys/Default (Linux).sublime-keymap",
                                     "platform": "Linux"
                                 },
                                 "caption": "Key Bindings – Default"
