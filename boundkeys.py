@@ -344,15 +344,17 @@ and overrides.
         # Loop our loaded files and build a dictionary of files each
         # combination is present in keyed on the actual key combination
         for lastPath in subKeys:
-            for binding in subKeys[lastPath]["object"]:
-                self.bindings[
-                    self.prepKey(binding["keys"])
-                ].append(subKeys[lastPath]["name"])
+            if "object" in subKeys[lastPath]:
+                for binding in subKeys[lastPath]["object"]:
+                    self.bindings[
+                        self.prepKey(binding["keys"])
+                    ].append(subKeys[lastPath]["name"])
         for lastPath in userKeys:
-            for binding in userKeys[lastPath]["object"]:
-                self.bindings[
-                    self.prepKey(binding["keys"])
-                ].append(userKeys[lastPath]["name"])
+            if "object" in userKeys[lastPath]:
+                for binding in userKeys[lastPath]["object"]:
+                    self.bindings[
+                        self.prepKey(binding["keys"])
+                    ].append(userKeys[lastPath]["name"])
 
         # Build our output. User first, then plugins, finally default
         if errorLoading:
@@ -365,7 +367,8 @@ and overrides.
             os.sep,
             self.platform
         )
-        text += self.getOutput(subKeys[lastPath])
+        if "object" in subKeys[lastPath]:
+            text += self.getOutput(subKeys[lastPath])
         for lastPath in sorted(userKeys):
             text += self.getOutput(userKeys[lastPath])
         lastPath = "%s%sDefault (%s).sublime-keymap" % (
@@ -373,7 +376,8 @@ and overrides.
             os.sep,
             self.platform
         )
-        text += self.getOutput(subKeys[lastPath], True)
+        if "object" in subKeys[lastPath]:
+            text += self.getOutput(subKeys[lastPath], True)
 
         # Open a new tab and populate it with the text generated above
         results = view.window().new_file()
