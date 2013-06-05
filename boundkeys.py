@@ -240,7 +240,6 @@ and overrides.
                         print("File not found: %s" % fullPath)
                     except zipfile.BadZipfile:
                         print("Bad zip file: %s" % fullPath)
-                    # TODO: Other exceptions???
                 else:
                     fileZipPath = None
                     # Else file is just text
@@ -250,7 +249,7 @@ and overrides.
                         lastPath
                     )
                     try:
-                        jsonObj = self.jsonify(open(fullPath, "r").read())
+                        jsonObj = self.jsonify(open(fullPath, "r", encoding="utf-8").read())
                     except IOError:
                         pass
 
