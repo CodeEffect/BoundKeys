@@ -16,7 +16,7 @@ folders and only lists keys from the file that takes precedence.
 The presented columns of data are: Key combination, command called, arguments to
 command and clashes.
 
-(https://github.com/CodeEffect/BoundKeys/raw/master/BoundKeys.png)
+![BoundKeys Screenshot](https://github.com/CodeEffect/BoundKeys/raw/master/BoundKeys.png)
 
 ## Manual installation ##
 
