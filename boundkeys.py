@@ -249,7 +249,10 @@ and overrides.
                         lastPath
                     )
                     try:
-                        jsonObj = self.jsonify(open(fullPath, "r", encoding="utf-8").read())
+                        if int(str(sublime.version())[0]) >= 3:
+                            jsonObj = self.jsonify(open(fullPath, "r", encoding="utf-8").read())
+                        else:
+                            jsonObj = self.jsonify(open(fullPath, "r").read())
                     except IOError:
                         pass
 
